@@ -14,6 +14,14 @@
 #include <QObject>
 #include "twitter.h"
 
+class OAuth2Details {
+
+    public:
+        Oauth2Details(Q)
+
+    private:
+};
+
 class TwitterClient {
 
     /*
