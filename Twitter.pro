@@ -2,4 +2,4 @@ HEADERS = twitter.h
 
 SOURCES = twitter.cpp
 
-QT += core widgets
+QT += core widgets network

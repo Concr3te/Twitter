@@ -1,4 +1,5 @@
 #include <QUrl>
+#include <QNetworkRequest>
 #include <QTimer>
 #include <QFile>
 #include <QMap>
@@ -12,14 +13,101 @@
 #include <QSettings>
 #include <QLabel>
 #include <QObject>
+#include <string>
 #include "twitter.h"
+#include "login.h"
 
 class OAuth2Details {
 
     public:
-        Oauth2Details(Q)
+        OAuth2Details(QString file);
+
+        QString OAuthToken();
+        QString OAuthTokenSecret();
+
+        QString OAuthConsumerKey();
+        QString OAuthConsumerSecret();
 
     private:
+        QString oauth_token;
+        QString oauth_token_secret;
+
+        QString oauth_consumer_key;
+        QString oauth_consumer_secret;
+};
+
+QString OAuth2Details::OAuthToken()
+{
+    return oauth_token;
+}
+
+QString OAuth2Details::OAuthTokenSecret()
+{
+    return oauth_token_secret;
+}
+
+QString OAuth2Details::OAuthConsumerKey()
+{
+    return oauth_consumer_key;
+}
+
+QString OAuth2Details::OAuthConsumerSecret()
+{
+    return oauth_consumer_secret;
+}
+
+OAuth2Details::OAuth2Details(QString file)
+{
+    QFile config(file);
+    QString line;
+
+    if (!config.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+    QTextStream in(&config);
+
+    while ((line = in.readLine())
+    {
+        //search for the said string
+        std::string temp = line.toStdString();
+        if(temp.find("oauth_consumer_key") != std::string::npos) {
+            QStringList list = temp.split("=");
+            if (list.size() = 2) {
+                this->oauth_consumer_key = list[1];
+            }
+        } else if(temp.find("oauth_consumer_secret") != std::string::npos)
+        {
+            QStringList list = temp.split("=");
+            if (list.size() = 2) {
+                this->oauth_consumer_secret = list[1];
+            }
+
+        } else if (temp.find("oauth_token") != std::string::npos)
+        {
+            QStringList list = temp.split("=");
+            if (list.size() = 2) {
+                this->oauth_token = list[1];
+            }
+        } else if (temp.find("oauth_token_secret") != std::string::npos)
+        {
+            QStringList list = temp.split("=");
+            if (list.size() = 2) {
+                this->oauth_token_secret = list[1];
+            }
+        }
+        else{
+            //qDebug<<temp;
+            ;
+        }
+    }
+}
+
+
+class TwitterSettings : public QSettings
+{
+    public:
+
+    private:
+        Login *login;
 };
 
 class TwitterClient {
@@ -46,18 +134,6 @@ class TwitterClient {
         QTextStream in(&config);
         QString line = in.readLine();
 
-
-        /*
-        while (!line.isNull()) {
-            list.append(line.split("="));
-        }
-
-        for( int i = 0; i < list.size(); i++){
-            _map[list[i]] = _map[list[i + 1]];
-        }
-
-        */
-
         _mainwindow->show();
         _mainwindow->setGeometry(1368 / 2 , 100, 400, 600);
      // connect(_timer, &QTimer::timeout, this)
@@ -66,10 +142,16 @@ class TwitterClient {
 
         _password = new QLineEdit();
 
+        _login = new QPushButton();
+        _login->setText("Login");
+        //_login->setColor(QColor::Blue);
+
         QFormLayout *_defaultlayout = new QFormLayout;
 
         _defaultlayout->addRow(QObject::tr("&Username:"), _username);
         _defaultlayout->addRow(QObject::tr("&Password"), _password);
+        _defaultlayout->addRow(_login);
+        _defaultlayout->addRow(_rememberme);
 
         _defaultlayout->setRowWrapPolicy(QFormLayout::DontWrapRows);
         _defaultlayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -81,7 +163,7 @@ class TwitterClient {
 
     bool Authorize(QString ApiEndpoint) 
     {
-
+        
     }
 
     void ClientLoop()
@@ -101,6 +183,7 @@ class TwitterClient {
         delete _password;
 
         delete _defaultlayout;
+
     }
 
     private:

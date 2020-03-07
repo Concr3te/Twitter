@@ -6,9 +6,9 @@ class Login {
     public:
         Login(QString username, QString password);
 
-        QString username();
+        QString Username();
 
-        QString password();
+        QString Password();
 
     private:
 
